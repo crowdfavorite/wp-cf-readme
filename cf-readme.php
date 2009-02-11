@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Crowd Favorite Read Me
+Plugin Name: CF Read Me
 Plugin URI: http://crowdfavorite.com
 Description: A readme file plugin that translates a <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a> formatted file in to a readme page. Requires the Crowd Favorite Compatability Plugin to function.
-Version: 1.1
+Version: 1.2
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */ 
@@ -16,6 +16,20 @@ Author URI: http://crowdfavorite.com
  * 4. Plugin adds a dashboard sub-menu in WPMU due to bugs in MU's implementation of add_menu_page
  * 5. Set content using the cfreadme_content filter
  */
+
+if (!function_exists('is_admin_page')) {
+	function is_admin_page() {
+		if (function_exists('is_admin')) {
+			return is_admin();
+		}
+		if (function_exists('check_admin_referer')) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+}
 
 function cfreadme_css() {
 	echo "
@@ -80,7 +94,7 @@ function cfreadme_menu_items() {
 	// add submenu to dashboard
 	if (is_admin_page()) {
 		if (is_null($wpmu_version)) {
-			add_menu_page('faq','FAQ',$user_level,'cf-faq','show_readme');
+			add_menu_page('faq','FAQ',$user_level,'cf-faq','cfreadme_show');
 		}
 		else {
 			// wpmu hack for top level menu items, don't like it, nope, not one bit
