@@ -89,7 +89,9 @@ Author URI: http://crowdfavorite.com
 	 * Show appropriate FAQ page
 	 */
 	function cfreadme_show() {
-		require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
+		if(!class_exists('Markdown')) {
+			require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
+		}
 		$content = apply_filters('cfreadme_content', 'No content set.');
 		$html = Markdown($content);
 		// modify content to facilitate the creation of a JavaScript TOC
