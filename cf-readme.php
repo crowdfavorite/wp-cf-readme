@@ -144,6 +144,14 @@ Author URI: http://crowdfavorite.com
 				margin-left:0;
 				padding-left:.75em;
 			}
+			#readme-tabs li.active {
+				list-style-type: none;
+			}
+			#readme-tabs li.active a {
+				font-weight: bold;
+				color: #555;
+				cursor: default;
+			}
 		</style>
 		";
 	}
