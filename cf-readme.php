@@ -38,7 +38,7 @@ Author URI: http://crowdfavorite.com
 		$user_level = apply_filters('cfreadme_user_level',2);
 	
 		// add submenu to dashboard
-		if (is_admin_page()) {
+		if (is_admin_page()) {		
 			if (is_null($wpmu_version) || version_compare($wpmu_version,'2.7','>=')) {
 				add_menu_page('faq','FAQ',$user_level,'cf-faq','cfreadme_show');
 				if(version_compare($wpmu_version,'2.7','>=')) {
@@ -89,9 +89,7 @@ Author URI: http://crowdfavorite.com
 	 * Show appropriate FAQ page
 	 */
 	function cfreadme_show() {
-		if (!function_exists('Markdown')) {
-			require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
-		}
+		require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
 		$content = apply_filters('cfreadme_content', 'No content set.');
 		$html = Markdown($content);
 		// modify content to facilitate the creation of a JavaScript TOC
@@ -242,8 +240,10 @@ Author URI: http://crowdfavorite.com
 
 	/**
 	 * example of adding another admin menu page using the same plugin code
-	 * @NOTE - add_submenu_page must have a specific identifier for the 1st item
+	 * @NOTE - WP 2.6 add_submenu_page must have a specific identifier for the 1st item
 	 *		add_submenu_page('cf-faq',$your_faq_id,$your_faq_title,$user_access_level,$your_faq_page_name,'cfreadme_show');
+	 * @NOTE - WPMU 2.6
+	 * 		add_submenu_page('index.php',$your_faq_id,$your_faq_title,$user_access_level,$your_faq_page_name,'cfreadme_show'); 
 	 */
 	/*
 	function add_another_readme_menu() {
