@@ -20,6 +20,7 @@ Author URI: http://crowdfavorite.com
  *	  Section IDs are generated automatically unless an anchor (<a>) is found as a child of the H2 and that anchor has an ID
  *	  The section ID can be found in the TOC list at the top - to link in from another page just add "readme-" to the front of it to trigger the switch at page load
  * 8. Additional ReadMe pages can be added under the FAQ Menu. See the bottom of this file for example code
+ * 9. Plugin options can be modified via the cfreadme_options filter
  */
 
 // ADMIN MENU ITEMS
@@ -34,20 +35,21 @@ Author URI: http://crowdfavorite.com
 	 * level of the plugin page
 	 */
 	function cfreadme_menu_items() {
-		global $wpmu_version, $wp_version;
-		$user_level = apply_filters('cfreadme_user_level',2);
+		global $wpmu_version, $wp_version, $opts;
 	
+		$opts = cfreadme_getopts();
+
 		// add submenu to dashboard
 		if (is_admin_page()) {		
 			if (is_null($wpmu_version) || version_compare($wpmu_version,'2.7','>=')) {
-				add_menu_page('faq','FAQ',$user_level,'cf-faq','cfreadme_show');
+				add_menu_page($opts['id'],$opts['page_title'],$opts['user_level'],$opts['page_id'],'cfreadme_show');
 				if(version_compare($wpmu_version,'2.7','>=')) {
 					add_action('admin_init','cfreadme_sort_admin_menu',999);
 				}
 			}
 			else {
 				// wpmu hack for top level menu items, don't like it, nope, not one bit
-				add_submenu_page('index.php','faq','FAQ',$user_level,'cf-faq','cfreadme_show');
+				add_submenu_page('index.php',$opts['id'],$opts['page_title'],$opts['user_level'],$opts['page_id'],'cfreadme_show');
 			}
 			// load js
 			if(is_plugin_page()) {
@@ -62,24 +64,40 @@ Author URI: http://crowdfavorite.com
 	 */
 	function cfreadme_sort_admin_menu() {
 		global $menu;
+		$opts = cfreadme_getopts();
 	
-		$menu_sep = $dash = null;
+		$menu_sep = $dash = $dash_key = null;
 		foreach($menu as $key => $menu_item) {
 			// grab the dashboard item, find it explicitly in case anyone else has moved it
 			if(isset($menu_item[5]) && $menu_item[5] == 'menu-dashboard' && $dash == null) {
 				$dash = $menu_item;
-				unset($menu[$key]);
+				$dash_key = $key;
 			}
 			// we'll most certainly hit a separator before we hit our menu, clone it
 			if($menu_item[4] == 'wp-menu-separator' && $menu_sep == null) {
 				$menu_sep = $menu_item;
 			}
 			// unset the current FAQ position and shove it and a separator on the front of the menu
-			if($menu_item[0] == 'FAQ') {
-				unset($menu[$key]);
+			if($menu_item[2] == $opts['page_id']) {
+				unset($menu[$key],$menu[$dash_key]);
 				array_unshift($menu,$dash,$menu_sep,$menu_item);
 			}
 		}
+	}
+
+	/**
+	 * Centralized method to get menu options since we need them in multiple places
+	 * 
+	 * @return array
+	 */
+	function cfreadme_getopts() {
+		$opts = array(
+			'id' => 'faq',
+			'page_id' => 'cf-faq',
+			'page_title' => 'FAQ',
+			'user_level' => 2
+		);
+		return array_merge($opts,apply_filters('cfreadme_options',$opts));
 	}
 
 
