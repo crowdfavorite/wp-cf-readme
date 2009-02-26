@@ -63,26 +63,30 @@ Author URI: http://crowdfavorite.com
 	 * Sort the admin menu items to force our menu item to be first
 	 */
 	function cfreadme_sort_admin_menu() {
-		global $menu;
-		$opts = cfreadme_getopts();
-	
-		$menu_sep = $dash = $dash_key = null;
-		foreach($menu as $key => $menu_item) {
-			// grab the dashboard item, find it explicitly in case anyone else has moved it
-			if(isset($menu_item[5]) && $menu_item[5] == 'menu-dashboard' && $dash == null) {
-				$dash = $menu_item;
-				$dash_key = $key;
-			}
-			// we'll most certainly hit a separator before we hit our menu, clone it
-			if($menu_item[4] == 'wp-menu-separator' && $menu_sep == null) {
-				$menu_sep = $menu_item;
-			}
-			// unset the current FAQ position and shove it and a separator on the front of the menu
-			if($menu_item[2] == $opts['page_id']) {
-				unset($menu[$key],$menu[$dash_key]);
-				array_unshift($menu,$dash,$menu_sep,$menu_item);
-			}
-		}
+	        global $menu;
+	        $opts = cfreadme_getopts();
+      
+	        $menu_sep = $dash = $dash_key = null; 
+	        $menutemp = $menu; // nasty bug in 5.1.6 - loop a copy so the internal pointer doesn't get borked
+	        foreach($menutemp as $key => $menu_item) {
+	                // grab the dashboard item, find it explicitly in case anyone else has moved it
+	                if(isset($menu_item[5]) && $menu_item[5] == 'menu-dashboard' && $dash == null) { 
+	                        $dash = $menu_item;
+	                        $dash_key = $key; 
+	                        continue;
+	                }       
+	                // we'll most certainly hit a separator before we hit our menu, clone it
+	                if($menu_item[4] == 'wp-menu-separator' && $menu_sep == null) { 
+	                        $menu_sep = $menu_item;
+	                        continue;
+	                }       
+	                // unset the current FAQ position and shove it and a separator on the front of the menu
+	                if($menu_item[2] == $opts['page_id']) {
+	                        unset($menu[$key],$menu[$dash_key]);
+	                        array_unshift($menu,$dash,$menu_sep,$menu_item);
+	                        continue;
+	                }       
+	        }       
 	}
 
 	/**
