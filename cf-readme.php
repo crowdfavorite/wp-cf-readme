@@ -91,13 +91,19 @@ Author URI: http://crowdfavorite.com
 	 * @return array
 	 */
 	function cfreadme_getopts() {
-		$opts = array(
-			'id' => 'faq',
-			'page_id' => 'cf-faq',
-			'page_title' => 'FAQ',
-			'user_level' => 2
-		);
-		return array_merge($opts,apply_filters('cfreadme_options',$opts));
+		global $cfreadme_opts;
+		
+		if(is_null($cfreadme_opts)) {
+			$opts = array(
+				'id' => 'faq',
+				'page_id' => 'cf-faq',
+				'page_title' => 'FAQ',
+				'user_level' => 2
+			);
+			$cfreadme_opts = array_merge($opts,apply_filters('cfreadme_options',$opts));
+		}
+
+		return $cfreadme_opts;
 	}
 
 
