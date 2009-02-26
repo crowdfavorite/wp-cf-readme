@@ -20,7 +20,7 @@ Author URI: http://crowdfavorite.com
  *	  Section IDs are generated automatically unless an anchor (<a>) is found as a child of the H2 and that anchor has an ID
  *	  The section ID can be found in the TOC list at the top - to link in from another page just add "readme-" to the front of it to trigger the switch at page load
  * 8. Additional ReadMe pages can be added under the FAQ Menu. See the bottom of this file for example code
- * 9. Plugin options can be modified via the cfreadme_options filter
+ * 9. Plugin options can be modified via the cfreadme_options filter. See the bottom of this file for example code
  */
 
 // ADMIN MENU ITEMS
@@ -293,5 +293,16 @@ Author URI: http://crowdfavorite.com
 		}
 		return $readme_content;
 	}
+	*/
+
+	/**
+	 * Example of modifying the FAQ menu item options
+	 */
+	/*
+	function set_faq_menu_options($options) {
+		$options['page_title'] = 'My FAQs';
+		return $options;
+	}
+	add_action('cfreadme_options','set_faq_menu_options');
 	*/
 ?>
