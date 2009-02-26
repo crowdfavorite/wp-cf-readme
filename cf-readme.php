@@ -100,7 +100,7 @@ Author URI: http://crowdfavorite.com
 				'page_title' => 'FAQ',
 				'user_level' => 2
 			);
-			$cfreadme_opts = array_merge($opts,apply_filters('cfreadme_options',$opts));
+			$cfreadme_opts = apply_filters('cfreadme_options',$opts);
 		}
 
 		return $cfreadme_opts;
