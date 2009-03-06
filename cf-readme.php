@@ -6,9 +6,9 @@ Description: A readme file plugin that translates a <a href="http://daringfireba
 Version: 1.2
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
-*/ 
+*/
 
-/** 
+/**
  * PLUGIN NOTES:
  * 1. Uses the cf-compat plugin for < WP 2.6 compatability
  * 2. Uses the cf-compat plugin for < PHP 4.3 compatability (for file_get_contents)
@@ -30,17 +30,17 @@ Author URI: http://crowdfavorite.com
 	 * Top level menu items are a bit convoluted, we need the plugin to only
 	 * add the menu item and point to a completely separate functionality page
 	 *
-	 * User level works off of the older user level integers that can be 
-	 * passed to add_(sub)menu_page funcitons to designate the user access 
+	 * User level works off of the older user level integers that can be
+	 * passed to add_(sub)menu_page funcitons to designate the user access
 	 * level of the plugin page
 	 */
 	function cfreadme_menu_items() {
 		global $wpmu_version, $wp_version, $opts;
-	
+
 		$opts = cfreadme_getopts();
 
 		// add submenu to dashboard
-		if (is_admin_page()) {		
+		if (is_admin_page()) {
 			if (is_null($wpmu_version) || version_compare($wpmu_version,'2.7','>=')) {
 				add_menu_page($opts['id'],$opts['page_title'],$opts['user_level'],$opts['page_id'],'cfreadme_show');
 				if(version_compare($wpmu_version,'2.7','>=')) {
@@ -50,10 +50,6 @@ Author URI: http://crowdfavorite.com
 			else {
 				// wpmu hack for top level menu items, don't like it, nope, not one bit
 				add_submenu_page('index.php',$opts['id'],$opts['page_title'],$opts['user_level'],$opts['page_id'],'cfreadme_show');
-			}
-			// load js
-			if(is_plugin_page()) {
-				wp_enqueue_script('cfreadme-js',trailingslashit(get_bloginfo('url')).'index.php?cf_action=cfreadme_js','jquery','1.0');
 			}
 		}
 	}
@@ -65,38 +61,38 @@ Author URI: http://crowdfavorite.com
 	function cfreadme_sort_admin_menu() {
 	        global $menu;
 	        $opts = cfreadme_getopts();
-      
-	        $menu_sep = $dash = $dash_key = null; 
+
+	        $menu_sep = $dash = $dash_key = null;
 	        $menutemp = $menu; // nasty bug in 5.1.6 - loop a copy so the internal pointer doesn't get borked
 	        foreach($menutemp as $key => $menu_item) {
 	                // grab the dashboard item, find it explicitly in case anyone else has moved it
-	                if(isset($menu_item[5]) && $menu_item[5] == 'menu-dashboard' && $dash == null) { 
+	                if(isset($menu_item[5]) && $menu_item[5] == 'menu-dashboard' && $dash == null) {
 	                        $dash = $menu_item;
-	                        $dash_key = $key; 
+	                        $dash_key = $key;
 	                        continue;
-	                }       
+	                }
 	                // we'll most certainly hit a separator before we hit our menu, clone it
-	                if($menu_item[4] == 'wp-menu-separator' && $menu_sep == null) { 
+	                if($menu_item[4] == 'wp-menu-separator' && $menu_sep == null) {
 	                        $menu_sep = $menu_item;
 	                        continue;
-	                }       
+	                }
 	                // unset the current FAQ position and shove it and a separator on the front of the menu
 	                if($menu_item[2] == $opts['page_id']) {
 	                        unset($menu[$key],$menu[$dash_key]);
 	                        array_unshift($menu,$dash,$menu_sep,$menu_item);
 	                        continue;
-	                }       
-	        }       
+	                }
+	        }
 	}
 
 	/**
 	 * Centralized method to get menu options since we need them in multiple places
-	 * 
+	 *
 	 * @return array
 	 */
 	function cfreadme_getopts() {
 		global $cfreadme_opts;
-		
+
 		if(is_null($cfreadme_opts)) {
 			$opts = array(
 				'id' => 'faq',
@@ -128,7 +124,7 @@ Author URI: http://crowdfavorite.com
 	<div class="wrap cf-readme">
 		'.$html.'
 	</div>
-		';	
+		';
 	}
 
 
@@ -137,7 +133,7 @@ Author URI: http://crowdfavorite.com
 	function cfreadme_css() {
 		echo "
 		<style type='text/css'>
-			.cf-readme ul, 
+			.cf-readme ul,
 			.cf-readme ol {
 				margin: 0 0 1em 1.5em;
 			}
@@ -255,7 +251,7 @@ Author URI: http://crowdfavorite.com
 		';
 	}
 	add_action('admin_head','cfreadme_javascript');
-	
+
 
 // COMPATABILITY
 
@@ -272,8 +268,8 @@ Author URI: http://crowdfavorite.com
 			}
 		}
 	}
-	
-	
+
+
 // ADDITIONAL FAQ PAGE SAMPLE CODE
 
 	/**
@@ -281,7 +277,7 @@ Author URI: http://crowdfavorite.com
 	 * @NOTE - WP 2.6 add_submenu_page must have a specific identifier for the 1st item
 	 *		add_submenu_page('cf-faq',$your_faq_id,$your_faq_title,$user_access_level,$your_faq_page_name,'cfreadme_show');
 	 * @NOTE - WPMU 2.6
-	 * 		add_submenu_page('index.php',$your_faq_id,$your_faq_title,$user_access_level,$your_faq_page_name,'cfreadme_show'); 
+	 * 		add_submenu_page('index.php',$your_faq_id,$your_faq_title,$user_access_level,$your_faq_page_name,'cfreadme_show');
 	 */
 	/*
 	function add_another_readme_menu() {
