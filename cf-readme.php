@@ -122,6 +122,7 @@ Author URI: http://crowdfavorite.com
 		
 		// set default content
 		$content = '<h1>'.get_bloginfo('name')." FAQ</h1>\n\n";
+		$content = apply_filters('cfreadme_pre_content',$content);
 		
 		// pull enqueued items if any
 		if(is_a($cfreadme,'CF_ReadMe')) {
