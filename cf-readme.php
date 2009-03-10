@@ -21,6 +21,7 @@ Author URI: http://crowdfavorite.com
  *	  The section ID can be found in the TOC list at the top - to link in from another page just add "readme-" to the front of it to trigger the switch at page load
  * 8. Additional ReadMe pages can be added under the FAQ Menu. See the bottom of this file for example code
  * 9. Plugin options can be modified via the cfreadme_options filter. See the bottom of this file for example code
+ * 10. ReadMe content can now be Enqueued using a WP_Dependencies extended class.
  */
 
 // ADMIN MENU ITEMS
@@ -113,11 +114,24 @@ Author URI: http://crowdfavorite.com
 	 * Show appropriate FAQ page
 	 */
 	function cfreadme_show() {
+		global $cfreadme;
+		
 		if(!class_exists('Markdown')) {
 			require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
 		}
-		$content = apply_filters('cfreadme_content', 'No content set.');
+		
+		// set default content
+		$content = '<h1>'.get_bloginfo('name')." FAQ</h1>\n\n";
+		
+		// pull enqueued items if any
+		if(is_a($cfreadme,'CF_ReadMe')) {
+			$content .= $cfreadme->get_contents();
+		}
+		
+		// apply filters
+		$content = apply_filters('cfreadme_content', $content);
 		$html = Markdown($content);
+		
 		// modify content to facilitate the creation of a JavaScript TOC
 		$html = preg_replace("/(<\/h2>)(.*?)(<h2>|$)/si","$1<div>$2</div>$3",$html);
 		echo '
@@ -128,6 +142,103 @@ Author URI: http://crowdfavorite.com
 	}
 
 
+// ENQUEUE README
+
+	if(class_exists('WP_Dependencies')) {
+		/**
+		 * Add a readme function to the queue.
+		 * Functions added must return their readme content, not echo.
+		 * Dependencies will not only dictate order, but wether the item shows at all
+		 *
+		 * @TODO: create ordering without dependencies
+		 *
+		 * @param string $handle - unique ID of the script being added 
+		 * @param string $src - funtion that returns the readme content
+		 * @param array $deps - IDs of any items that need to be shown before this readme
+		 */
+		function cfreadme_enqueue($handle,$src,$deps=array()) {
+			global $cfreadme;
+			if(!is_a($cfreadme,'CF_Readme')) {
+				$cfreadme = new CF_Readme;
+			}
+		
+			// if deps was passed as a string then compensate
+			if(!is_array($deps)) {
+				$deps = array($deps);
+			}
+		
+			$cfreadme->add($handle,$src,$deps);
+			$cfreadme->enqueue($handle);
+		}
+	
+		/**
+		 * Register some readme content.
+		 * Adds readme content to the class, but the content won't show
+		 * unless another readme addition lists it as a dependency, in which
+		 * case this script will be added and shown first.
+		 *
+		 * @param string $handle - unique ID of the script being added 
+		 * @param string $src - funtion that returns the readme content
+		 * @param array $deps - IDs of any items that need to be shown before this readme
+		 */
+		function cfreadme_register($handle,$src,$deps=array()) {
+			global $cfreadme;
+			if(!is_a($cfreadme,'CF_Readme')) {
+				$cfreadme = new CF_Readme;
+			}
+
+			$cfreadme->add($handle,$src,$deps);		
+		}
+	
+		/**
+		 * Remove a readme from the queue
+		 *
+		 * @param string $handle 
+		 */
+		function cfreadme_deregister($handle) {
+			global $cfreadme;
+			if(!is_a($cfreadme,'CF_Readme')) {
+				$cfreadme = new CF_Readme;
+			}
+
+			$cfreadme->remove($handle);
+		}
+
+		/**
+		 * CF_Readme
+		 * A class that extends the WordPress WP_Dependencies class to 
+		 * provide an accessible means of adding readme content as well
+		 * as provide for a means of basic ordering by enabling a plugin
+		 * to define any other items that must come before it.
+		 *
+		 * Use the accessor functions above to use this functionality
+		 *
+		 * @uses WP_Dependencies
+		 */
+		class CF_Readme extends WP_Dependencies {
+
+			var $content;
+
+			function __construct() {
+				$this->content = '';
+			}
+
+			function get_contents($handles = false) {
+				$this->do_items($handles);
+				return $this->content;
+			}
+
+			// concatenate the readme
+			function do_item($handle) {
+				$func = $this->registered[$handle]->src;
+				if(function_exists($func)) {
+					$this->content .= "\n".$func()."\n";
+				}
+			}
+		}
+		
+	} // end if(class_exists('WP_Dependencies'))
+	
 // CSS
 
 	function cfreadme_css() {
@@ -169,6 +280,11 @@ Author URI: http://crowdfavorite.com
 				border-left:.25em solid #eaeaea;
 				margin-left:0;
 				padding-left:.75em;
+			}
+			.cf-readme img {
+				background: white;
+				border: 1px solid gray;
+				padding: 5px;
 			}
 			#readme-tabs li.active {
 				list-style-type: none;
@@ -268,7 +384,6 @@ Author URI: http://crowdfavorite.com
 			}
 		}
 	}
-
 
 // ADDITIONAL FAQ PAGE SAMPLE CODE
 
