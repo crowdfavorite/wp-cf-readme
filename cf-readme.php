@@ -156,8 +156,9 @@ Author URI: http://crowdfavorite.com
 		 * @param string $handle - unique ID of the script being added 
 		 * @param string $src - funtion that returns the readme content
 		 * @param array $deps - IDs of any items that need to be shown before this readme
+		 * @param int $priority - priority of output
 		 */
-		function cfreadme_enqueue($handle,$src,$deps=array()) {
+		function cfreadme_enqueue($handle,$src,$deps=array(),$priority=5) {
 			global $cfreadme;
 			if(!is_a($cfreadme,'CF_Readme')) {
 				$cfreadme = new CF_Readme;
@@ -170,6 +171,7 @@ Author URI: http://crowdfavorite.com
 		
 			$cfreadme->add($handle,$src,$deps);
 			$cfreadme->enqueue($handle);
+			$cfreadme->set_priority($handle,$priority);
 		}
 	
 		/**
@@ -218,24 +220,77 @@ Author URI: http://crowdfavorite.com
 		 */
 		class CF_Readme extends WP_Dependencies {
 
+			var $priorities;
 			var $content;
-
+			
+			/**
+			 * Construct
+			 */
 			function __construct() {
 				$this->content = '';
 			}
-
+			
+			/**
+			 * PHP4 compat
+			 */
+			function CF_Readme() {
+				$this->__construct();
+			}
+			
+			/**
+			 * Build the contents of the total ReadMe output
+			 *
+			 * @param bool/array $handles 
+			 * @return string html
+			 */
 			function get_contents($handles = false) {
+				$this->order_by_priority();
 				$this->do_items($handles);
 				return $this->content;
 			}
 
-			// concatenate the readme
+			/**
+			 * concatenate the readme in to the content var
+			 *
+			 * @param string $handle 
+			 */
 			function do_item($handle) {
 				$func = $this->registered[$handle]->src;
 				if(function_exists($func)) {
 					$this->content .= "\n".$func()."\n";
 				}
 			}
+			
+			/**
+			 * build an array of priorities for later ordering of output
+			 *
+			 * @param string $handle 
+			 * @param int $priority 
+			 * @return bool
+			 */
+			function set_priority($handle,$priority) {
+				return $this->priorities[$handle] = $priority;
+			}
+			
+			/**
+			 * Order the queue by priority
+			 * Dependencies still take precendence over priortiy, so items dependent
+			 * upon another item will come AFTER their dependency
+			 */
+			function order_by_priority() {
+				uasort($this->queue,array($this,'order_by_callback'));
+			}
+			
+				/**
+				 * Comparison function for priority ordering
+				 *
+				 * @param string $a - readme handle
+				 * @param string $b - readme handle
+				 * @return int
+				 */
+				function order_by_callback($a,$b) {
+					return $this->priorities[$a] < $this->priorities[$b] ? -1 : 1;
+				}
 		}
 		
 	} // end if(class_exists('WP_Dependencies'))
