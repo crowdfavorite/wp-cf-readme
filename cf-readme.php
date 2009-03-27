@@ -411,12 +411,12 @@ Author URI: http://crowdfavorite.com
 			_this = jQuery(this);
 			jQuery(_this.attr("href")).show().siblings("div").hide();
 			_this.parent().addClass("active").siblings().removeClass("active");
+			//window.location.hash = _this.attr("href");
 			return false;
 		});
 
 		// @TODO - trigger click on tab link if hash present
-		view_section = location.hash.replace("#readme-","");
-		jQuery("#readme-tabs li a[href=\"#"+view_section+"\"]").click();
+		//jQuery("#readme-tabs li a[@href^="+window.location.hash+"]").click();
 	});
 //]]>
 </script>
