@@ -36,21 +36,21 @@ Author URI: http://crowdfavorite.com
 	 * level of the plugin page
 	 */
 	function cfreadme_menu_items() {
-		global $wpmu_version, $wp_version, $opts;
+		global $wpmu_version, $wp_version, $cfreadme_opts;
 
-		$opts = cfreadme_getopts();
+		$cfreadme_opts = cfreadme_getopts();
 
 		// add submenu to dashboard
 		if (is_admin_page()) {
 			if (is_null($wpmu_version) || version_compare($wpmu_version,'2.7','>=')) {
-				add_menu_page($opts['id'],$opts['page_title'],$opts['user_level'],$opts['page_id'],'cfreadme_show');
+				add_menu_page($cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
 				if(version_compare($wpmu_version,'2.7','>=')) {
 					add_action('admin_init','cfreadme_sort_admin_menu',999);
 				}
 			}
 			else {
 				// wpmu hack for top level menu items, don't like it, nope, not one bit
-				add_submenu_page('index.php',$opts['id'],$opts['page_title'],$opts['user_level'],$opts['page_id'],'cfreadme_show');
+				add_submenu_page('index.php',$cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
 			}
 		}
 	}
@@ -61,7 +61,7 @@ Author URI: http://crowdfavorite.com
 	 */
 	function cfreadme_sort_admin_menu() {
 	        global $menu;
-	        $opts = cfreadme_getopts();
+	        $cfreadme_opts = cfreadme_getopts();
 
 	        $menu_sep = $dash = $dash_key = null;
 	        $menutemp = $menu; // nasty bug in 5.1.6 - loop a copy so the internal pointer doesn't get borked
@@ -78,7 +78,7 @@ Author URI: http://crowdfavorite.com
 	                        continue;
 	                }
 	                // unset the current FAQ position and shove it and a separator on the front of the menu
-	                if($menu_item[2] == $opts['page_id']) {
+	                if($menu_item[2] == $cfreadme_opts['page_id']) {
 	                        unset($menu[$key],$menu[$dash_key]);
 	                        array_unshift($menu,$dash,$menu_sep,$menu_item);
 	                        continue;
@@ -95,13 +95,13 @@ Author URI: http://crowdfavorite.com
 		global $cfreadme_opts;
 
 		if(is_null($cfreadme_opts)) {
-			$opts = array(
+			$cfreadme_opts = array(
 				'id' => 'faq',
 				'page_id' => 'cf-faq',
 				'page_title' => 'FAQ',
 				'user_level' => 2
 			);
-			$cfreadme_opts = apply_filters('cfreadme_options',$opts);
+			$cfreadme_opts = apply_filters('cfreadme_options',$cfreadme_opts);
 		}
 
 		return $cfreadme_opts;
@@ -298,6 +298,11 @@ Author URI: http://crowdfavorite.com
 // CSS
 
 	function cfreadme_css() {
+		// global $plugin_page;
+		// $opts = cfreadme_getopts();
+		// if($plugin_page != $opts['page_id']) { return; }
+		if(!is_plugin_page()) { return; }
+		
 		echo "
 		<style type='text/css'>
 			.cf-readme ul,
@@ -362,6 +367,11 @@ Author URI: http://crowdfavorite.com
 	 * Javascript for organizing the UI in to tabs based on the H2 tag
 	 */
 	function cfreadme_javascript() {
+		// global $plugin_page;
+		// $opts = cfreadme_getopts();
+		// if($plugin_page != $opts['page_id']) { return; }
+		if(!is_plugin_page()) { return; }
+		
 		echo '
 <script type="text/javascript">
 //<[CDATA[
