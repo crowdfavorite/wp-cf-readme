@@ -426,7 +426,7 @@ Author URI: http://crowdfavorite.com
 		});
 
 		// @TODO - trigger click on tab link if hash present
-		//jQuery("#readme-tabs li a[@href^="+window.location.hash+"]").click();
+		jQuery("#readme-tabs li a[@href^="+window.location.hash+"]").click();
 	});
 //]]>
 </script>
