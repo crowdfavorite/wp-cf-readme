@@ -136,7 +136,7 @@ Author URI: http://crowdfavorite.com
 		// modify content to facilitate the creation of a JavaScript TOC
 		$html = preg_replace("/(<\/h2>)(.*?)(<h2>|$)/si","$1<div>$2</div>$3",$html);
 		echo '
-	<div class="wrap cf-readme">
+	<div id="cf-readme" class="wrap cf-readme">
 		'.$html.'
 	</div>
 		';
@@ -367,9 +367,6 @@ Author URI: http://crowdfavorite.com
 	 * Javascript for organizing the UI in to tabs based on the H2 tag
 	 */
 	function cfreadme_javascript() {
-		// global $plugin_page;
-		// $opts = cfreadme_getopts();
-		// if($plugin_page != $opts['page_id']) { return; }
 		if(!is_plugin_page()) { return; }
 		
 		echo '
@@ -378,13 +375,13 @@ Author URI: http://crowdfavorite.com
 	// find all H2s and make tab sets
 	jQuery(function(){
 		// make tab ul
-		jQuery("<ul>").attr("id","readme-tabs").insertAfter(jQuery(".cf-readme h1"));
+		tabs = jQuery("<ul>").attr("id","readme-tabs").insertAfter(jQuery(".cf-readme h1"));
 
 		var divcount = 0;
 		jQuery(".cf-readme h2").each(function(){
 			_this = jQuery(this);
 			divcount++;
-
+			
 			// make sure the h2 does not contain a link, if so, use the link text
 			if(_this.children("a").length) {
 				child = _this.children("a");
@@ -401,18 +398,21 @@ Author URI: http://crowdfavorite.com
 				link_text = _this.html();
 				div_id = "section-" + divcount;
 			}
-
-			// add an li to the tab list
-			jQuery("<li>").append(
-				jQuery("<a>").attr("href","#"+div_id).html(link_text)
-			).appendTo(jQuery("#readme-tabs"));
+			
+			// build link and add to TOC
+			// built a bit janky for IE compatability
+			jQuery("<a>"+link_text+"</a>").attr("href","#"+div_id).appendTo("<li>").parent().appendTo(tabs);
+						
 			// give the trailing div an id and move the h2 inside
 			_this.next("div").attr("id",div_id).prepend(_this);
+			
+			// return to top link
+			jQuery("<a>Top</a>").attr("href","#cf-readme").appendTo("<p>").parent().appendTo(_this.parent());
 		});
 
 		// make the tab list do neat stuff
-		jQuery("#readme-tabs li:first-child").addClass("active");
-		jQuery("#readme-tabs li a").each(function(){
+		tabs.find("li:first-child").addClass("active");
+		tabs.find("li a").each(function(){
 			_this = jQuery(this);
 			if(_this.parent().attr("class") != "active") {
 				jQuery(_this.attr("href")).hide();
@@ -421,12 +421,14 @@ Author URI: http://crowdfavorite.com
 			_this = jQuery(this);
 			jQuery(_this.attr("href")).show().siblings("div").hide();
 			_this.parent().addClass("active").siblings().removeClass("active");
-			//window.location.hash = _this.attr("href");
+			window.location.hash = _this.attr("href");
 			return false;
 		});
 
 		// @TODO - trigger click on tab link if hash present
-		jQuery("#readme-tabs li a[@href^="+window.location.hash+"]").click();
+		if(window.location.hash.length) {
+			tabs.find("li a[@href^="+window.location.hash+"]").click();
+		}
 	});
 //]]>
 </script>
