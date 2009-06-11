@@ -1,0 +1,6 @@
+# CF ReadMe Changelog
+
+## 1.4
+
+- fixed IE rendering errors.
+- activated ability to bookmark FAQ items
