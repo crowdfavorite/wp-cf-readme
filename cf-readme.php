@@ -44,7 +44,7 @@ Author URI: http://crowdfavorite.com
 		if (is_admin_page()) {
 			if (is_null($wpmu_version) || version_compare($wpmu_version,'2.7','>=')) {
 				add_menu_page($cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
-				if(version_compare($wpmu_version,'2.7','>=')) {
+				if(version_compare($wpmu_version,'2.7','>=') || version_compare($wp_version,'2.8','>=')) {
 					add_action('admin_init','cfreadme_sort_admin_menu',999);
 				}
 			}
@@ -402,7 +402,7 @@ Author URI: http://crowdfavorite.com
 			
 			// build link and add to TOC
 			// built a bit janky for IE compatability
-			jQuery("<a>"+link_text+"</a>").attr("href","#"+div_id).appendTo("<li>").parent().appendTo(tabs);
+			jQuery("<a>"+link_text+"</a>").attr("href","#cfs-"+div_id).appendTo("<li>").parent().appendTo(tabs);
 						
 			// give the trailing div an id and move the h2 inside
 			_this.next("div").attr("id",div_id).prepend(_this);
@@ -416,11 +416,11 @@ Author URI: http://crowdfavorite.com
 		tabs.find("li a").each(function(){
 			_this = jQuery(this);
 			if(_this.parent().attr("class") != "active") {
-				jQuery(_this.attr("href")).hide();
+				jQuery(_this.attr("href").replace("cfs-","")).hide();
 			}
 		}).click(function(){
 			_this = jQuery(this);
-			jQuery(_this.attr("href")).show().siblings("div").hide();
+			jQuery(_this.attr("href").replace("cfs-","")).show().siblings("div").hide();
 			_this.parent().addClass("active").siblings().removeClass("active");
 			window.location.hash = _this.attr("href");
 			return false;
@@ -428,7 +428,7 @@ Author URI: http://crowdfavorite.com
 
 		// @TODO - trigger click on tab link if hash present
 		if(window.location.hash.length) {
-			tabs.find("li a[@href^="+window.location.hash+"]").click();
+			tabs.find("li a[href^="+window.location.hash+"]").click();
 		}
 	});
 //]]>
