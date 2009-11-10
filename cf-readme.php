@@ -277,6 +277,9 @@ Author URI: http://crowdfavorite.com
 			#cf-readme {
 				width: 90%;
 			}
+			#cf-readme .cfreadme-intro {
+				margin: 15px 0;
+			}
 			.cf-readme ul,
 			.cf-readme ol {
 				margin: 0 0 1em 1.5em;
@@ -370,8 +373,14 @@ Author URI: http://crowdfavorite.com
 			return string.replace(/[^\w]+/g,"-").replace(/[^[:allnum:]]/g,"").toLowerCase();
 		}
 		
-		// make tab ul
-		tabs = jQuery("<ul>").attr("id","readme-tabs").insertAfter(jQuery(".cf-readme h1"));
+		// allow for a div.cfreadme-intro right after the H1 to preceed the nav list
+		var listafter = jQuery(".cf-readme h1");
+		if (jQuery(".cf-readme h1 + div.cfreadme-intro").length > 0) {
+			listafter = jQuery(".cf-readme h1 + div.cfreadme-intro");
+		}
+
+		// make tab ul		
+		tabs = jQuery("<ul>").attr("id","readme-tabs").insertAfter(listafter);
 
 		var divcount = 0;
 		jQuery(".cf-readme h2").each(function() {
