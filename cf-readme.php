@@ -42,49 +42,17 @@ Author URI: http://crowdfavorite.com
 
 		// add submenu to dashboard
 		if (is_admin_page()) {
-			if (is_null($wpmu_version) || version_compare($wpmu_version,'2.7','>=')) {
+			if (version_compare($wp_version,'2.7','>=')) {
 				add_menu_page($cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
-				if(version_compare($wpmu_version,'2.7','>=') || version_compare($wp_version,'2.8','>=')) {
-					add_action('admin_init','cfreadme_sort_admin_menu',999);
-				}
 			}
 			else {
-				// wpmu hack for top level menu items, don't like it, nope, not one bit
+				// WP 2.6 compat...
 				add_submenu_page('index.php',$cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
 			}
+			do_action('cf-readme-admin-menu');
 		}
 	}
 	add_action('admin_menu', 'cfreadme_menu_items');
-
-	/**
-	 * Sort the admin menu items to force our menu item to be first
-	 */
-	function cfreadme_sort_admin_menu() {
-	        global $menu;
-	        $cfreadme_opts = cfreadme_getopts();
-
-	        $menu_sep = $dash = $dash_key = null;
-	        $menutemp = $menu; // nasty bug in 5.1.6 - loop a copy so the internal pointer doesn't get borked
-	        foreach($menutemp as $key => $menu_item) {
-	                // grab the dashboard item, find it explicitly in case anyone else has moved it
-	                if(isset($menu_item[5]) && $menu_item[5] == 'menu-dashboard' && $dash == null) {
-	                        $dash = $menu_item;
-	                        $dash_key = $key;
-	                        continue;
-	                }
-	                // we'll most certainly hit a separator before we hit our menu, clone it
-	                if($menu_item[4] == 'wp-menu-separator' && $menu_sep == null) {
-	                        $menu_sep = $menu_item;
-	                        continue;
-	                }
-	                // unset the current FAQ position and shove it and a separator on the front of the menu
-	                if($menu_item[2] == $cfreadme_opts['page_id']) {
-	                        unset($menu[$key],$menu[$dash_key]);
-	                        array_unshift($menu,$dash,$menu_sep,$menu_item);
-	                        continue;
-	                }
-	        }
-	}
 
 	/**
 	 * Centralized method to get menu options since we need them in multiple places
@@ -115,7 +83,7 @@ Author URI: http://crowdfavorite.com
 	 */
 	function cfreadme_show() {
 		global $cfreadme;
-		
+
 		if(!class_exists('Markdown')) {
 			require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
 		}
@@ -306,6 +274,9 @@ Author URI: http://crowdfavorite.com
 		
 		echo "
 		<style type='text/css'>
+			#cf-readme {
+				width: 90%;
+			}
 			.cf-readme ul,
 			.cf-readme ol {
 				margin: 0 0 1em 1.5em;
@@ -315,6 +286,9 @@ Author URI: http://crowdfavorite.com
 			}
 			.cf-readme ul {
 				list-style-type: disc;
+			}
+			.cf-readme #readme-tabs {
+				list-style-type: none;
 			}
 			.cf-readme li {
 				margin-bottom:0;
@@ -349,7 +323,7 @@ Author URI: http://crowdfavorite.com
 				padding: 5px;
 			}
 			#readme-tabs li.active {
-				list-style-type: none;
+				list-style-type: circle;
 			}
 			#readme-tabs li.active a {
 				font-weight: bold;
@@ -368,23 +342,44 @@ Author URI: http://crowdfavorite.com
 	 * Javascript for organizing the UI in to tabs based on the H2 tag
 	 */
 	function cfreadme_javascript() {
-		if(!is_plugin_page()) { return; }
-		
 		echo '
 <script type="text/javascript">
 //<[CDATA[
+	jQuery(function($) {
+		$("#menu-dashboard")
+			.after($("#toplevel_page_cf-faq"))
+			.after($("#adminmenu li.wp-menu-separator:first").clone(true));
+	});
+
+		';
+		
+		// get out if we're not on the plugin page
+		if(!is_plugin_page()) { 
+			echo '
+//]]>
+</script>			
+			';
+			return; 
+		}
+		
+		echo '
+
 	// find all H2s and make tab sets
 	jQuery(function(){
+		function cf_js_sanitize(string) {
+			return string.replace(/[^\w]+/g,"-").replace(/[^[:allnum:]]/g,"").toLowerCase();
+		}
+		
 		// make tab ul
 		tabs = jQuery("<ul>").attr("id","readme-tabs").insertAfter(jQuery(".cf-readme h1"));
 
 		var divcount = 0;
-		jQuery(".cf-readme h2").each(function(){
+		jQuery(".cf-readme h2").each(function() {
 			_this = jQuery(this);
 			divcount++;
 			
 			// make sure the h2 does not contain a link, if so, use the link text
-			if(_this.children("a").length) {
+			if (_this.children("a").length) {
 				child = _this.children("a");
 				link_text = child.html();
 				if(child.attr("id").length) {
@@ -392,17 +387,17 @@ Author URI: http://crowdfavorite.com
 					child.removeAttr("id");
 				}
 				else {
-					div_id = "section-" + divcount;
+					div_id = cf_js_sanitize(link_text);
 				}
 			}
 			else {
 				link_text = _this.html();
-				div_id = "section-" + divcount;
+				div_id = cf_js_sanitize(link_text);
 			}
 			
 			// build link and add to TOC
 			// built a bit janky for IE compatability
-			jQuery("<a>"+link_text+"</a>").attr("href","#cfs-"+div_id).appendTo("<li>").parent().appendTo(tabs);
+			jQuery("<a class=\"readme-tab-link\">"+link_text+"</a>").attr("href","#cfs-"+div_id).appendTo("<li>").parent().appendTo(tabs);
 						
 			// give the trailing div an id and move the h2 inside
 			_this.next("div").attr("id",div_id).prepend(_this);
@@ -413,21 +408,27 @@ Author URI: http://crowdfavorite.com
 
 		// make the tab list do neat stuff
 		tabs.find("li:first-child").addClass("active");
-		tabs.find("li a").each(function(){
+		tabs.find("li a").each(function() {
 			_this = jQuery(this);
-			if(_this.parent().attr("class") != "active") {
+			if (_this.parent().attr("class") != "active") {
 				jQuery(_this.attr("href").replace("cfs-","")).hide();
 			}
-		}).click(function(){
+		}).click(function() {
 			_this = jQuery(this);
 			jQuery(_this.attr("href").replace("cfs-","")).show().siblings("div").hide();
 			_this.parent().addClass("active").siblings().removeClass("active");
 			window.location.hash = _this.attr("href");
 			return false;
 		});
+		
+		// grant links who start with a hash the functionality to click the appropriate tab-link item
+		jQuery("#cf-readme a[href^=\'#\']").not(".readme-tab-link").click(function() {
+			jQuery("#readme-tabs a[href=\'" + jQuery(this).attr("href") + "\']").click();
+			return false;
+		});
 
-		// @TODO - trigger click on tab link if hash present
-		if(window.location.hash.length) {
+		// trigger click on tab link if hash present
+		if (window.location.hash.length) {
 			tabs.find("li a[href^="+window.location.hash+"]").click();
 		}
 	});
