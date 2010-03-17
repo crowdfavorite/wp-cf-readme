@@ -1,5 +1,9 @@
 # CF ReadMe Changelog
 
+## 1.5.1
+
+- Tagging latest version for release
+
 ## 1.5
 - Adding WP 2.8 compatibility for admin sidebar reordering. 
 - Update hash-auto-click functionality so that the page doesn't jump and hide the nav, it just auto-triggers the desired content display.
