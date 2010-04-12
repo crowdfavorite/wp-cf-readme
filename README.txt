@@ -54,6 +54,22 @@ Images may be included with the plugin for display. In your readme content forma
 
 Multiple ReadMe content entries can be added by a single plugin by adding in each block of content with a unique handle.
 
+## Introductions
+
+The ReadMe plugin will honor a .cfreadme-intro section at the top of the readme content. This allows for intro content or common instructions to be consistently displayed at the top of the readme screen. There is only one intro div and it is not dynamically populated.
+
+	# My ReadMe File
+	
+	<div class="cfreadme-intro">
+		Put your intro text here
+	</div>
+	
+	<!-- navigation menu will be inserted here -->
+	
+	---
+	
+	## Content 1
+	...
 
 ## Dependencies
 

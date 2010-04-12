@@ -2,6 +2,8 @@
 
 ## 1.5.1
 
+- Plugin allows a .cfreadme-intro div to sit at the top of every documentation page
+- Updated admin menu sorting to use JavaScript instead of PHP to put documentation list at the top of the admin menu
 - Tagging latest version for release
 
 ## 1.5
