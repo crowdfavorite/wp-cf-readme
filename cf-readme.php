@@ -3,7 +3,7 @@
 Plugin Name: CF Read Me
 Plugin URI: http://crowdfavorite.com
 Description: A readme file plugin that translates a <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a> formatted file in to a readme page. Requires the Crowd Favorite Compatability Plugin to function.
-Version: 1.5.1
+Version: 1.5.2
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */

@@ -1,5 +1,9 @@
 # CF ReadMe Changelog
 
+##1.5.2
+
+- Tested successfully on WordPress 3.0
+
 ## 1.5.1
 
 - Plugin allows a .cfreadme-intro div to sit at the top of every documentation page
