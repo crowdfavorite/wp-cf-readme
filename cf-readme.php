@@ -42,7 +42,8 @@ Author URI: http://crowdfavorite.com
 
 		// add submenu to dashboard
 		if (is_admin_page()) {
-			if (version_compare($wp_version,'2.7','>=')) {
+			/* If WordPress version gte 2.7, or on WP.com... */
+			if (version_compare($wp_version,'2.7','>=') || $wp_version == 'MU') {
 				add_menu_page($cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
 			}
 			else {
