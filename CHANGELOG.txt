@@ -1,5 +1,9 @@
 # CF ReadMe Changelog
 
+## trunk
+
+- changing to role-based instead of integer-based user-level.
+
 ##1.5.2
 
 - Tested successfully on WordPress 3.0
