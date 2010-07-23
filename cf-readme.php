@@ -68,7 +68,7 @@ Author URI: http://crowdfavorite.com
 				'id' => 'faq',
 				'page_id' => 'cf-faq',
 				'page_title' => 'FAQ',
-				'user_level' => 2
+				'user_level' => 'author'
 			);
 			$cfreadme_opts = apply_filters('cfreadme_options',$cfreadme_opts);
 		}
