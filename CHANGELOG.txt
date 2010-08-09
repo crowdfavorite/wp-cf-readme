@@ -3,6 +3,7 @@
 ## trunk
 
 - changing to role-based instead of integer-based user-level.
+- removing compatibility code for versions < 3.0 since we're not supporting less than 3.0 any more
 
 ##1.5.2
 

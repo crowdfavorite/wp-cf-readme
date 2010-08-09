@@ -10,9 +10,6 @@ Author URI: http://crowdfavorite.com
 
 /**
  * PLUGIN NOTES:
- * 1. Uses the cf-compat plugin for < WP 2.6 compatability
- * 2. Uses the cf-compat plugin for < PHP 4.3 compatability (for file_get_contents)
- * 3. Requires the cf-compat plugin for is_admin_page function
  * 4. Plugin adds a dashboard sub-menu in WPMU < 2.7 due to bugs in MU's implementation of add_menu_page
  * 5. Set content using the cfreadme_content filter, there is currently no queue for setting dislay order of added items
  * 6. Plugin automatically breaks content sections at H2 elements and creates a TOC based on the H2 content
@@ -31,27 +28,21 @@ Author URI: http://crowdfavorite.com
 	 * Top level menu items are a bit convoluted, we need the plugin to only
 	 * add the menu item and point to a completely separate functionality page
 	 *
-	 * User level works off of the older user level integers that can be
-	 * passed to add_(sub)menu_page funcitons to designate the user access
-	 * level of the plugin page
 	 */
 	function cfreadme_menu_items() {
 		global $wpmu_version, $wp_version, $cfreadme_opts;
 
 		$cfreadme_opts = cfreadme_getopts();
 
-		// add submenu to dashboard
-		if (is_admin_page()) {
-			/* If WordPress version gte 2.7, or on WP.com... */
-			if (version_compare($wp_version,'2.7','>=') || $wp_version == 'MU') {
-				add_menu_page($cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
-			}
-			else {
-				// WP 2.6 compat...
-				add_submenu_page('index.php',$cfreadme_opts['id'],$cfreadme_opts['page_title'],$cfreadme_opts['user_level'],$cfreadme_opts['page_id'],'cfreadme_show');
-			}
-			do_action('cf-readme-admin-menu');
-		}
+		// add menu to dashboard
+		add_menu_page(
+			$cfreadme_opts['id'],
+			$cfreadme_opts['page_title'],
+			$cfreadme_opts['user_level'],
+			$cfreadme_opts['page_id'],
+			'cfreadme_show'
+		);
+		do_action('cf-readme-admin-menu');
 	}
 	add_action('admin_menu', 'cfreadme_menu_items');
 
@@ -448,22 +439,6 @@ Author URI: http://crowdfavorite.com
 	}
 	add_action('admin_head','cfreadme_javascript');
 
-
-// COMPATABILITY
-
-	if (!function_exists('is_admin_page')) {
-		function is_admin_page() {
-			if (function_exists('is_admin')) {
-				return is_admin();
-			}
-			if (function_exists('check_admin_referer')) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	}
 
 // ADDITIONAL FAQ PAGE SAMPLE CODE
 
