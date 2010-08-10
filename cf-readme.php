@@ -42,6 +42,14 @@ Author URI: http://crowdfavorite.com
 			$cfreadme_opts['menu_slug'],
 			'cfreadme_show'
 		);
+		add_submenu_page(
+			$cfreadme_opts['menu_slug'],
+			$cfreadme_opts['page_title'],
+			$cfreadme_opts['menu_title'],
+			$cfreadme_opts['capability'],
+			$cfreadme_opts['menu_slug'],
+			'cfreadme_show'
+		);
 		do_action('cf-readme-admin-menu');
 	}
 	add_action('admin_menu', 'cfreadme_menu_items');
@@ -58,7 +66,7 @@ Author URI: http://crowdfavorite.com
 			$cfreadme_opts = array(
 				'page_title' => 'FAQ',
 				'menu_title' => 'FAQ',
-				'capability' => 'author',
+				'capability' => 'edit_posts',
 				'menu_slug' => 'cf-faq',
 			);
 			$cfreadme_opts = apply_filters('cfreadme_options',$cfreadme_opts);
