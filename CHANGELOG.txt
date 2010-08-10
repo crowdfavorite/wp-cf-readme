@@ -1,6 +1,6 @@
 # CF ReadMe Changelog
 
-## trunk
+## 1.5.3
 
 - changing to capability-based permission check for menu addition.
 - removing compatibility code for versions < 3.0 since we're not supporting less than 3.0 any more
