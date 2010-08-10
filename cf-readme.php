@@ -36,10 +36,10 @@ Author URI: http://crowdfavorite.com
 
 		// add menu to dashboard
 		add_menu_page(
-			$cfreadme_opts['id'],
 			$cfreadme_opts['page_title'],
-			$cfreadme_opts['user_level'],
-			$cfreadme_opts['page_id'],
+			$cfreadme_opts['menu_title'],
+			$cfreadme_opts['capability'],
+			$cfreadme_opts['menu_slug'],
 			'cfreadme_show'
 		);
 		do_action('cf-readme-admin-menu');
@@ -56,10 +56,10 @@ Author URI: http://crowdfavorite.com
 
 		if(is_null($cfreadme_opts)) {
 			$cfreadme_opts = array(
-				'id' => 'faq',
-				'page_id' => 'cf-faq',
 				'page_title' => 'FAQ',
-				'user_level' => 'author'
+				'menu_title' => 'FAQ',
+				'capability' => 'author',
+				'menu_slug' => 'cf-faq',
 			);
 			$cfreadme_opts = apply_filters('cfreadme_options',$cfreadme_opts);
 		}
@@ -259,9 +259,6 @@ Author URI: http://crowdfavorite.com
 // CSS
 
 	function cfreadme_css() {
-		// global $plugin_page;
-		// $opts = cfreadme_getopts();
-		// if($plugin_page != $opts['page_id']) { return; }
 		if(!is_plugin_page()) { return; }
 		
 		echo "
