@@ -1,5 +1,9 @@
 # CF ReadMe Changelog
 
+## 1.5.4
+
+- updated JS that moves the admin-menu item for better display and less interference with other menu items
+
 ## 1.5.3
 
 - changing to capability-based permission check for menu addition.
