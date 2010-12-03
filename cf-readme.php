@@ -346,9 +346,9 @@ Author URI: http://crowdfavorite.com
 <script type="text/javascript">
 //<[CDATA[
 	jQuery(function($) {
-		$("#menu-dashboard")
-			.after($("#toplevel_page_cf-faq"))
-			.after($("#adminmenu li.wp-menu-separator:first").clone(true));
+		$("#adminmenu li.wp-menu-separator:first")
+			.after($("#adminmenu li.wp-menu-separator:first").clone(true))
+			.after($("#toplevel_page_cf-faq"));
 	});
 
 		';
