@@ -89,7 +89,7 @@ The Plugin will build a Table of Contents based on `<h2>` elements in the page. 
 
 ## Linking to ReadMe Content
 
-The plugin allows content to be directly linked to and displayed by using its ID as the URL Hash. While this functionality exists and works it should not be relied upon as in the future the ids will be replaced with something that won't change when new items are added/removed from the list.
+The plugin allows content to be directly linked to and displayed by using its ID as the URL Hash.
 
 ## Multiple ReadMe Pages
 
