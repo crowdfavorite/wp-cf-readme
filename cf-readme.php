@@ -330,6 +330,14 @@ Author URI: http://crowdfavorite.com
 				color: #555;
 				cursor: default;
 			}
+			.cf-readme hr {
+				border: 1px solid #777777;
+				border-bottom: 1px solid white;
+			}
+			.cf-readme hr.light {
+				border: 1px solid #D1D1D1;
+				border-bottom: 1px solid white;
+			}
 		</style>
 		";
 	}
