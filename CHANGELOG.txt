@@ -3,6 +3,7 @@
 ## 1.5.4
 
 - updated JS that moves the admin-menu item for better display and less interference with other menu items
+- output styling updates
 
 ## 1.5.3
 
