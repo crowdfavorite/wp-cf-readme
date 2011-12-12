@@ -122,7 +122,7 @@ Author URI: http://crowdfavorite.com
 		 * @TODO: create ordering without dependencies
 		 *
 		 * @param string $handle - unique ID of the script being added 
-		 * @param string $src - funtion that returns the readme content
+		 * @param string $src - function that returns the readme content
 		 * @param array $deps - IDs of any items that need to be shown before this readme
 		 * @param int $priority - priority of output
 		 */
