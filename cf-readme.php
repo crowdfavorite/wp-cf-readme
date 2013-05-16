@@ -87,20 +87,20 @@ Author URI: http://crowdfavorite.com
 		if(!class_exists('Markdown')) {
 			require_once(realpath(dirname(__FILE__)).'/markdown/markdown.php');
 		}
-		
+
 		// set default content
 		$content = '<h1>'.get_bloginfo('name')." FAQ</h1>\n\n";
 		$content = apply_filters('cfreadme_pre_content',$content);
-		
+
 		// pull enqueued items if any
 		if(is_a($cfreadme,'CF_ReadMe')) {
 			$content .= $cfreadme->get_contents();
 		}
-		
+
 		// apply filters
 		$content = apply_filters('cfreadme_content', $content);
 		$html = Markdown($content);
-		
+
 		// modify content to facilitate the creation of a JavaScript TOC
 		$html = preg_replace("/(<\/h2>)(.*?)(<h2>|$)/si","$1<div>$2</div>$3",$html);
 		echo '
@@ -121,7 +121,7 @@ Author URI: http://crowdfavorite.com
 		 *
 		 * @TODO: create ordering without dependencies
 		 *
-		 * @param string $handle - unique ID of the script being added 
+		 * @param string $handle - unique ID of the script being added
 		 * @param string $src - function that returns the readme content
 		 * @param array $deps - IDs of any items that need to be shown before this readme
 		 * @param int $priority - priority of output
@@ -131,24 +131,24 @@ Author URI: http://crowdfavorite.com
 			if(!is_a($cfreadme,'CF_Readme')) {
 				$cfreadme = new CF_Readme;
 			}
-		
+
 			// if deps was passed as a string then compensate
 			if(!is_array($deps)) {
 				$deps = array($deps);
 			}
-		
+
 			$cfreadme->add($handle,$src,$deps);
 			$cfreadme->enqueue($handle);
 			$cfreadme->set_priority($handle,$priority);
 		}
-	
+
 		/**
 		 * Register some readme content.
 		 * Adds readme content to the class, but the content won't show
 		 * unless another readme addition lists it as a dependency, in which
 		 * case this script will be added and shown first.
 		 *
-		 * @param string $handle - unique ID of the script being added 
+		 * @param string $handle - unique ID of the script being added
 		 * @param string $src - funtion that returns the readme content
 		 * @param array $deps - IDs of any items that need to be shown before this readme
 		 */
@@ -158,13 +158,13 @@ Author URI: http://crowdfavorite.com
 				$cfreadme = new CF_Readme;
 			}
 
-			$cfreadme->add($handle,$src,$deps);		
+			$cfreadme->add($handle,$src,$deps);
 		}
-	
+
 		/**
 		 * Remove a readme from the queue
 		 *
-		 * @param string $handle 
+		 * @param string $handle
 		 */
 		function cfreadme_deregister($handle) {
 			global $cfreadme;
@@ -177,7 +177,7 @@ Author URI: http://crowdfavorite.com
 
 		/**
 		 * CF_Readme
-		 * A class that extends the WordPress WP_Dependencies class to 
+		 * A class that extends the WordPress WP_Dependencies class to
 		 * provide an accessible means of adding readme content as well
 		 * as provide for a means of basic ordering by enabling a plugin
 		 * to define any other items that must come before it.
@@ -191,25 +191,25 @@ Author URI: http://crowdfavorite.com
 
 			var $priorities;
 			var $content;
-			
+
 			/**
 			 * Construct
 			 */
 			function __construct() {
 				$this->content = '';
 			}
-			
+
 			/**
 			 * PHP4 compat
 			 */
 			function CF_Readme() {
 				$this->__construct();
 			}
-			
+
 			/**
 			 * Build the contents of the total ReadMe output
 			 *
-			 * @param bool/array $handles 
+			 * @param bool/array $handles
 			 * @return string html
 			 */
 			function get_contents($handles = false) {
@@ -221,7 +221,7 @@ Author URI: http://crowdfavorite.com
 			/**
 			 * concatenate the readme in to the content var
 			 *
-			 * @param string $handle 
+			 * @param string $handle
 			 */
 			function do_item($handle) {
 				$func = $this->registered[$handle]->src;
@@ -229,18 +229,18 @@ Author URI: http://crowdfavorite.com
 					$this->content .= "\n".$func()."\n";
 				}
 			}
-			
+
 			/**
 			 * build an array of priorities for later ordering of output
 			 *
-			 * @param string $handle 
-			 * @param int $priority 
+			 * @param string $handle
+			 * @param int $priority
 			 * @return bool
 			 */
 			function set_priority($handle,$priority) {
 				return $this->priorities[$handle] = $priority;
 			}
-			
+
 			/**
 			 * Order the queue by priority
 			 * Dependencies still take precendence over priortiy, so items dependent
@@ -249,7 +249,7 @@ Author URI: http://crowdfavorite.com
 			function order_by_priority() {
 				uasort($this->queue,array($this,'order_by_callback'));
 			}
-			
+
 				/**
 				 * Comparison function for priority ordering
 				 *
@@ -261,14 +261,15 @@ Author URI: http://crowdfavorite.com
 					return $this->priorities[$a] < $this->priorities[$b] ? -1 : 1;
 				}
 		}
-		
+
 	} // end if(class_exists('WP_Dependencies'))
-	
+
 // CSS
 
 	function cfreadme_css() {
-		if(!is_plugin_page()) { return; }
-		
+		global $plugin_page;
+		if(!isset($plugin_page)) { return; }
+
 		echo "
 		<style type='text/css'>
 			#cf-readme {
@@ -350,6 +351,7 @@ Author URI: http://crowdfavorite.com
 	 * Javascript for organizing the UI in to tabs based on the H2 tag
 	 */
 	function cfreadme_javascript() {
+		global $plugin_page;
 		echo '
 <script type="text/javascript">
 //<[CDATA[
@@ -360,16 +362,16 @@ Author URI: http://crowdfavorite.com
 	});
 
 		';
-		
+
 		// get out if we're not on the plugin page
-		if(!is_plugin_page()) { 
+		if(!isset($plugin_page)) {
 			echo '
 //]]>
-</script>			
+</script>
 			';
-			return; 
+			return;
 		}
-		
+
 		echo '
 
 	// find all H2s and make tab sets
@@ -377,21 +379,21 @@ Author URI: http://crowdfavorite.com
 		function cf_js_sanitize(string) {
 			return string.replace(/[^\w]+/g,"-").replace(/[^[:allnum:]]/g,"").toLowerCase();
 		}
-		
+
 		// allow for a div.cfreadme-intro right after the H1 to preceed the nav list
 		var listafter = jQuery(".cf-readme h1");
 		if (jQuery(".cf-readme h1 + div.cfreadme-intro").length > 0) {
 			listafter = jQuery(".cf-readme h1 + div.cfreadme-intro");
 		}
 
-		// make tab ul		
+		// make tab ul
 		tabs = jQuery("<ul>").attr("id","readme-tabs").insertAfter(listafter);
 
 		var divcount = 0;
 		jQuery(".cf-readme h2").each(function() {
 			_this = jQuery(this);
 			divcount++;
-			
+
 			// make sure the h2 does not contain a link, if so, use the link text
 			if (_this.children("a").length) {
 				child = _this.children("a");
@@ -408,14 +410,14 @@ Author URI: http://crowdfavorite.com
 				link_text = _this.html();
 				div_id = cf_js_sanitize(link_text);
 			}
-			
+
 			// build link and add to TOC
 			// built a bit janky for IE compatability
 			jQuery("<a class=\"readme-tab-link\">"+link_text+"</a>").attr("href","#cfs-"+div_id).appendTo("<li>").parent().appendTo(tabs);
-						
+
 			// give the trailing div an id and move the h2 inside
 			_this.next("div").attr("id",div_id).prepend(_this);
-			
+
 			// return to top link
 			jQuery("<a>Top</a>").attr("href","#cf-readme").appendTo("<p>").parent().appendTo(_this.parent());
 		});
@@ -434,7 +436,7 @@ Author URI: http://crowdfavorite.com
 			window.location.hash = _this.attr("href");
 			return false;
 		});
-		
+
 		// grant links who start with a hash the functionality to click the appropriate tab-link item
 		jQuery("#cf-readme a[href^=\'#\']").not(".readme-tab-link").click(function() {
 			jQuery("#readme-tabs a[href=\'" + jQuery(this).attr("href") + "\']").click();

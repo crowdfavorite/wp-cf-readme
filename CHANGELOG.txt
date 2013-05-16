@@ -1,5 +1,8 @@
 # CF ReadMe Changelog
 
+## trunk
+
+- Remove use of deprecated (since WP 3.1) is_plugin_page
 ## 1.5.4
 
 - updated JS that moves the admin-menu item for better display and less interference with other menu items
